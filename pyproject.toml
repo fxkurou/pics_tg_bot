@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "anime-pics-bot"
+version = "0.1.0"
+description = ""
+authors = ["Little-Wretch <nazarr914@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+aiogram = "^3.13.1"
+sqlalchemy = "^2.0.35"
+python-dotenv = "^1.0.1"
+asyncpg = "^0.29.0"
+asyncio = "^3.4.3"
+alembic = "^1.13.3"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
