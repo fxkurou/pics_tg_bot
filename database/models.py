@@ -29,6 +29,7 @@ class Picture(Base):
     user_tg_id: Mapped[int] = mapped_column(ForeignKey('users.tg_id'), nullable=False)
     file_name: Mapped[str] = mapped_column(nullable=False)
     tag: Mapped[str] = mapped_column()
+    file_path: Mapped[str] = mapped_column(nullable=False)
 
     user: Mapped["User"] = relationship("User", back_populates="pictures")
 

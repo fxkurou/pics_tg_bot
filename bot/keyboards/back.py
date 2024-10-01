@@ -1,10 +1,9 @@
 from aiogram.utils.keyboard import KeyboardButton, ReplyKeyboardMarkup
 
-load_pics_kb = ReplyKeyboardMarkup(
+back_kb = ReplyKeyboardMarkup(
     keyboard=[
         [
-            KeyboardButton(text=''),
-            KeyboardButton(text='')
+            KeyboardButton(text='Back'),
         ]
     ],
     resize_keyboard=True
