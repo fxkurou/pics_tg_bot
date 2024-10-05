@@ -5,8 +5,13 @@ start_kb = ReplyKeyboardMarkup(
         [
             KeyboardButton(text='Gallery'),
             KeyboardButton(text='Search'),
-            KeyboardButton(text='Upload pic')
+        ],
+        [
+            KeyboardButton(text='Upload pic'),
+            KeyboardButton(text='help')
         ]
     ],
-    resize_keyboard=True
+    resize_keyboard=True,
+    one_time_keyboard=True,
+    selective=True
 )

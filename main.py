@@ -23,6 +23,7 @@ logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 async def main():
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp.include_router(router)
+    await bot.delete_webhook(drop_pending_updates=True)
     await set_commands(bot)
     await dp.start_polling(bot)
 
