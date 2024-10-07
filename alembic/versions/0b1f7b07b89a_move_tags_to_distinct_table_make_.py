@@ -1,8 +1,8 @@
 """move tags to distinct table & make relation with Pictures
 
-Revision ID: af8abcf41406
+Revision ID: 0b1f7b07b89a
 Revises: 
-Create Date: 2024-10-02 20:16:51.439907
+Create Date: 2024-10-07 17:00:04.683579
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'af8abcf41406'
+revision: str = '0b1f7b07b89a'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -38,10 +38,9 @@ def upgrade() -> None:
     op.create_table('pictures',
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),
     sa.Column('user_tg_id', sa.Integer(), nullable=False),
-    sa.Column('file_name', sa.String(), nullable=False),
+    sa.Column('file_id', sa.String(), nullable=False),
     sa.Column('tag', sa.String(), nullable=False),
     sa.Column('file_path', sa.String(), nullable=False),
-    sa.ForeignKeyConstraint(['tag'], ['tags.name'], ),
     sa.ForeignKeyConstraint(['user_tg_id'], ['users.tg_id'], ),
     sa.PrimaryKeyConstraint('id')
     )

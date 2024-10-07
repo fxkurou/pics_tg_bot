@@ -7,8 +7,8 @@ start_kb = ReplyKeyboardMarkup(
             KeyboardButton(text='Search'),
         ],
         [
-            KeyboardButton(text='Upload pic'),
-            KeyboardButton(text='help')
+            KeyboardButton(text='Upload picture'),
+            KeyboardButton(text='Help')
         ]
     ],
     resize_keyboard=True,
