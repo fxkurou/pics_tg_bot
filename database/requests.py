@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from database.models import User, Picture
+from database.models import User, Picture, Tag
 
 
 async def get_user_by_tg_id(session: AsyncSession, tg_id: int) -> User:
@@ -15,9 +15,19 @@ async def register_user(session: AsyncSession, tg_id: int, username: str = None)
     await session.commit()
     return user
 
-async def store_picture(session: AsyncSession, user_id: int, file_id: str, file_path: str, tag: str):
-    """Store a picture in the database."""
-    picture = Picture(user_tg_id=user_id, file_id=file_id, file_path=file_path, tag=tag)
-    session.add(picture)
+async def get_all_tags(session: AsyncSession):
+    """Retrieve all tags from the database."""
+    result = await session.execute(select(Tag))
+    return result.scalars().all()
+
+async def get_tag_by_name(session: AsyncSession, name: str):
+    """Retrieve a tag by its name."""
+    result = await session.execute(select(Tag).filter_by(name=name))
+    return result.scalars().first()
+
+async def create_tag(session: AsyncSession, name: str):
+    """Create a new tag."""
+    tag = Tag(name=name)
+    session.add(tag)
     await session.commit()
-    return picture
+    return tag

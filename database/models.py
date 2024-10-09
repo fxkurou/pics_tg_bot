@@ -28,10 +28,11 @@ class Picture(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_tg_id: Mapped[int] = mapped_column(ForeignKey('users.tg_id'), nullable=False)
     file_id: Mapped[str] = mapped_column(nullable=False)
-    tag: Mapped[str] = mapped_column()
+    tag_name: Mapped[str] = mapped_column(ForeignKey('tags.name'), nullable=False)
     file_path: Mapped[str] = mapped_column(nullable=False)
 
     user: Mapped["User"] = relationship("User", back_populates="pictures")
+    tag: Mapped["Tag"] = relationship("Tag", back_populates="pictures")
 
     def __repr__(self):
         return f'<Picture {self.id}, user_id {self.user_tg_id}, file_id {self.file_id},tags {self.tag}>'
