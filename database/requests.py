@@ -31,3 +31,8 @@ async def create_tag(session: AsyncSession, name: str):
     session.add(tag)
     await session.commit()
     return tag
+
+async def get_pictures_by_tag(session: AsyncSession, tag_name: str):
+    """Retrieve all pictures by a tag."""
+    result = await session.execute(select(Picture).filter_by(tag_name=tag_name))
+    return result.scalars().all()

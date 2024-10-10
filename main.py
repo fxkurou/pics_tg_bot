@@ -10,11 +10,13 @@ from bot.router import main_router as router
 from bot.utils.commands import set_commands
 from dotenv import load_dotenv
 
+from database.redis_config import redis_storage
+
 load_dotenv()
 
 TOKEN = os.getenv('TOKEN')
 ADMIN_ID = os.getenv('ADMIN_ID')
-dp = Dispatcher()
+dp = Dispatcher(storage=redis_storage)
 
 logging.basicConfig(level=logging.INFO, stream=sys.stdout)
 logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)

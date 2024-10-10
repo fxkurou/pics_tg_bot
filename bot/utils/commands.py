@@ -18,7 +18,7 @@ async def set_commands(bot: Bot):
         ),
         BotCommand(
             command='/upload_pic',
-            description='Add pic to gallery'
+            description='Add pics to gallery'
         ),
         BotCommand(
             command='/help',
