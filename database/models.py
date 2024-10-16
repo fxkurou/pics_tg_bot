@@ -30,9 +30,11 @@ class Picture(Base):
     file_id: Mapped[str] = mapped_column(nullable=False)
     tag_name: Mapped[str] = mapped_column(ForeignKey('tags.name'), nullable=False)
     file_path: Mapped[str] = mapped_column(nullable=False)
+    # payment_id: Mapped[str] = mapped_column(ForeignKey('payments.id'))
 
     user: Mapped["User"] = relationship("User", back_populates="pictures")
     tag: Mapped["Tag"] = relationship("Tag", back_populates="pictures")
+    # payment: Mapped["Payment"] = relationship("Payment", back_populates="pictures")
 
     def __repr__(self):
         return f'<Picture {self.id}, user_id {self.user_tg_id}, file_id {self.file_id},tags {self.tag}>'
@@ -48,3 +50,17 @@ class Tag(Base):
 
     def __repr__(self):
         return f'<Tag {self.name}>'
+
+#
+# class Payment(Base):
+#     __tablename__ = 'payments'
+#
+#     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+#     amount: Mapped[int] = mapped_column(nullable=False)
+#     currency: Mapped[str] = mapped_column(nullable=False)
+#     is_paid: Mapped[bool] = mapped_column(default=False)
+#
+#     pictures: Mapped[list["Picture"]] = relationship("Picture", back_populates="payment")
+#
+#     def __repr__(self):
+#         return f'<Payment {self.id}, amount {self.amount}, currency {self.currency}, is_paid {self.is_paid}>'

@@ -1,17 +1,14 @@
-from aiogram.utils.keyboard import KeyboardButton, ReplyKeyboardMarkup
+from aiogram.utils.keyboard import InlineKeyboardButton, InlineKeyboardMarkup
 
-start_kb = ReplyKeyboardMarkup(
-    keyboard=[
+start_kb = InlineKeyboardMarkup(
+    inline_keyboard=[
         [
-            KeyboardButton(text='Gallery'),
-            KeyboardButton(text='Search'),
+            InlineKeyboardButton(text='Gallery', callback_data='gallery'),
+            InlineKeyboardButton(text='Search', callback_data='search'),
         ],
         [
-            KeyboardButton(text='Upload picture'),
-            KeyboardButton(text='Help')
+            InlineKeyboardButton(text='Upload picture', callback_data='upload'),
+            InlineKeyboardButton(text='Help', callback_data='help'),
         ]
     ],
-    resize_keyboard=True,
-    one_time_keyboard=True,
-    selective=True
 )

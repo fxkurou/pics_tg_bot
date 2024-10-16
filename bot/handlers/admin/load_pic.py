@@ -2,7 +2,7 @@ import os
 
 from aiogram import Router, F
 from aiogram.filters import StateFilter
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 from aiogram.fsm.context import FSMContext
 
 from bot.filters.admin import IsAdmin
@@ -29,9 +29,10 @@ admin_id = int(os.getenv('ADMIN_ID'))
 load_pic_router = Router()
 
 
-@load_pic_router.message(F.text.casefold() == 'upload picture', IsAdmin(admin_id))
-async def upload_pic(message: Message, state: FSMContext):
-    await message.answer('Send me a pic you want to upload. Type "back" to cancel.', reply_markup=back_kb)
+@load_pic_router.callback_query(F.data == 'upload', IsAdmin(admin_id))
+async def upload_pic(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer('Send me a pic you want to upload.', reply_markup=back_kb)
+    await callback.answer()
     await state.set_state(LoadPicsState.load_pic)
 
 

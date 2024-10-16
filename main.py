@@ -7,7 +7,6 @@ from aiogram import Bot, Dispatcher
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
 from bot.router import main_router as router
-from bot.utils.commands import set_commands
 from dotenv import load_dotenv
 
 from database.redis_config import redis_storage
@@ -26,7 +25,7 @@ async def main():
     bot = Bot(token=TOKEN, default=DefaultBotProperties(parse_mode=ParseMode.HTML))
     dp.include_router(router)
     await bot.delete_webhook(drop_pending_updates=True)
-    await set_commands(bot)
+    # await set_commands(bot)
     await dp.start_polling(bot)
 
 
