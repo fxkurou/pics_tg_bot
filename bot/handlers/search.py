@@ -6,7 +6,7 @@ from aiogram.fsm.context import FSMContext
 from bot.filters.tag import TagValidator
 from bot.keyboards.back import back_kb
 from bot.keyboards.start import start_kb
-from bot.keyboards.tags import get_tags_kb
+from bot.keyboards.tags import get_tags_kb, TagsCallbackFactory
 from bot.states.search import SearchState
 from database.config import get_session
 
@@ -25,9 +25,9 @@ async def search(callback: CallbackQuery, state: FSMContext):
     await state.set_state(SearchState.search_tags)
 
 
-@search_router.callback_query(F.data, StateFilter(SearchState.search_tags))
-async def search_results(callback: CallbackQuery, state: FSMContext):
-    tag_name = callback.data
+@search_router.callback_query(TagsCallbackFactory.filter(), StateFilter(SearchState.search_tags))
+async def search_results(callback: CallbackQuery, callback_data: TagsCallbackFactory, state: FSMContext):
+    tag_name = callback_data.name
 
     await callback.message.answer('Here are the results:', reply_markup=ReplyKeyboardRemove())
     async with get_session() as session:
