@@ -10,6 +10,7 @@ from bot.filters.tag import TagValidator
 from bot.keyboards.back import back_kb
 from bot.keyboards.start import start_kb
 from bot.states.load_pics import LoadPicsState
+from bot.utils.commands_text import start
 from database.config import get_session
 from database.models import Picture
 
@@ -75,9 +76,14 @@ async def upload_picture_tag(message: Message, state: FSMContext):
     await state.clear()
 
 
+@load_pic_router.message(StateFilter(LoadPicsState.load_pic))
+async def handle_invalid_pic(message: Message):
+    await message.answer('Please send a photo.', reply_markup=back_kb)
+
+
 @load_pic_router.message(F.text.casefold() == 'back')
 async def back_to_start(message: Message, state: FSMContext):
-    await message.answer('What would u like to do now?', reply_markup=start_kb)
+    await message.answer(start, reply_markup=start_kb)
     await state.clear()
 
 

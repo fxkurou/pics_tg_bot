@@ -8,8 +8,12 @@ class TagsCallbackFactory(CallbackData, prefix='tag'):
 
 
 async def get_tags_kb(tags):
+    sorted_tags = sorted(tags, key=lambda tag: tag.name)
+
     kb = InlineKeyboardBuilder()
-    for tag in tags:
+    for tag in sorted_tags:
         callback_data = TagsCallbackFactory(name=tag.name).pack()
         kb.add(InlineKeyboardButton(text=tag.name, callback_data=callback_data))
+    kb.adjust(3)
+    kb.row(InlineKeyboardButton(text='Back', callback_data='back'))
     return kb.as_markup()
