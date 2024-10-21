@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+PICS_DIR = 'pics'
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 POSTGRES_USER = os.getenv("POSTGRES_USER")

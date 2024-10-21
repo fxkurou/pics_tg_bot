@@ -3,7 +3,7 @@ import os
 from aiogram import Bot
 from aiogram import Router
 from aiogram.filters import CommandStart
-from aiogram.types import Message
+from aiogram.types import Message, FSInputFile
 from dotenv import load_dotenv
 
 from bot.keyboards.start import start_kb
@@ -32,11 +32,13 @@ async def get_start(message: Message):
     async with get_session() as session:
         try:
             user = await get_user_by_tg_id(session, tg_id)
-            if user:
-                await message.answer(start, reply_markup=start_kb)
-            else:
+            photo = FSInputFile('data/start_image.jpg')
+
+            if not user:
                 await register_user(session, tg_id, username)
-                await message.answer(start, reply_markup=start_kb)
+
+            await message.answer_photo(photo, start, reply_markup=start_kb)
+
         finally:
             await session.close()
 
