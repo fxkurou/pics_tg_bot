@@ -13,5 +13,5 @@ async def get_tags_kb(tags):
         callback_data = TagsCallbackFactory(name=tag.name).pack()
         kb.add(InlineKeyboardButton(text=tag.name, callback_data=callback_data))
     kb.adjust(3)
-    kb.row(InlineKeyboardButton(text='Back', callback_data='back'))
+    kb.row(InlineKeyboardButton(text='⬅Back', callback_data='back'))
     return kb.as_markup()

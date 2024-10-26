@@ -3,6 +3,7 @@ from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, InputMediaPhoto, FSInputFile
 from aiogram.fsm.context import FSMContext
 
+from bot.handlers.start import get_start
 from bot.keyboards.carousel import pics_paginator, PaginationCallback
 from bot.keyboards.start import start_kb
 from bot.keyboards.tags import get_tags_kb, TagsCallbackFactory
@@ -66,9 +67,9 @@ async def paginate(callback: CallbackQuery, callback_data: PaginationCallback, s
     elif action == 'next' and current_page < len(pics) - 1:
         current_page += 1
     elif action == 'back':
-        await callback.message.answer(start, reply_markup=start_kb)
+        await search(callback, state)
         await callback.answer()
-        await state.clear()
+        await state.set_state(SearchState.search_tags)
         return
 
     if 0 <= current_page < len(pics):
@@ -92,6 +93,6 @@ async def search_results(message: Message, state: FSMContext):
 
 @search_router.callback_query(F.data == 'back', StateFilter(SearchState.search_tags))
 async def go_back(callback: CallbackQuery, state: FSMContext):
-    await callback.message.edit_text(start, reply_markup=start_kb)
+    await get_start(callback.message)
     await callback.answer()
     await state.clear()
