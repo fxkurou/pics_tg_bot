@@ -5,10 +5,8 @@ from aiogram.fsm.context import FSMContext
 
 from bot.handlers.start import get_start
 from bot.keyboards.carousel import pics_paginator, PaginationCallback
-from bot.keyboards.start import start_kb
-from bot.keyboards.tags import get_tags_kb, TagsCallbackFactory
+from bot.keyboards.tags import get_tags_kb, TagsCallbackFactory, TagsPaginationCallbackFactory
 from bot.states.search import SearchState
-from bot.utils.commands_text import start
 from database.config import get_session
 
 from database.requests import get_pictures_by_tag, get_all_tags
@@ -20,11 +18,15 @@ search_router = Router()
 async def search(callback: CallbackQuery, state: FSMContext):
     async with get_session() as session:
         tags = await get_all_tags(session)
-    tags_kb = await get_tags_kb(tags)
+    tags_kb = await get_tags_kb(tags, page=0)
     photo = FSInputFile('data/search_image.jpg')
-    media = InputMediaPhoto(media=photo, caption='Choose a tag to search for pictures. 🧐', parse_mode='Markdown')
+    media = InputMediaPhoto(media=photo, caption='Choose a tag to search for. 🧐', parse_mode='Markdown')
 
-    await callback.message.edit_media(media, reply_markup=tags_kb)
+    try:
+        await callback.message.edit_media(media, reply_markup=tags_kb)
+    except Exception:
+        await callback.message.answer_photo(photo=photo, caption='Choose a tag to search for. 😊', reply_markup=tags_kb)
+
     await callback.answer()
     await state.set_state(SearchState.search_tags)
 
@@ -40,17 +42,31 @@ async def search_results(callback: CallbackQuery, callback_data: TagsCallbackFac
     if pics:
         pic = pics[page]
         kb = pics_paginator(page, pics)
-        await callback.message.answer_photo(photo=pic.file_id, caption=pic.tag_name, reply_markup=kb)
+        media = InputMediaPhoto(media=pic.file_id)
+        await callback.message.edit_media(media=media, caption=pic.tag_name, reply_markup=kb)
 
         await state.update_data(tag_name=tag_name, page=page)
     else:
-        await callback.answer('No pictures found. 😔', show_alert=True)
+        await callback.message.edit_caption('No pictures found. 😔')
 
     await callback.answer()
 
 
+@search_router.callback_query(TagsPaginationCallbackFactory.filter())
+async def handle_tags_pagination(callback: CallbackQuery, callback_data: TagsPaginationCallbackFactory):
+    page = callback_data.page
+
+    async with get_session() as session:
+        tags = await get_all_tags(session)
+
+    tags_kb = await get_tags_kb(tags, page=page)
+
+    await callback.message.edit_reply_markup(reply_markup=tags_kb)
+    await callback.answer()
+
+
 @search_router.callback_query(PaginationCallback.filter() , StateFilter(SearchState.search_tags))
-async def paginate(callback: CallbackQuery, callback_data: PaginationCallback, state: FSMContext):
+async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallback, state: FSMContext):
     page = callback_data.page
     action = callback_data.action
 

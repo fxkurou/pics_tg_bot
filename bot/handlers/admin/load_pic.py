@@ -77,11 +77,11 @@ async def upload_picture_tag(message: Message, state: FSMContext):
         session.add(picture)
         await session.commit()
 
-    await message.answer('Picture uploaded! What would u like to do now?', reply_markup=start_kb)
+    await get_start(message)
     await state.clear()
 
 
-@load_pic_router.message(F.text.casefold() == 'back')
+@load_pic_router.message(F.text.casefold() == '⬅back')
 async def back_to_start(message: Message, state: FSMContext):
     await get_start(message)
     await state.clear()
