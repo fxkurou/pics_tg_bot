@@ -30,7 +30,7 @@ class Picture(Base):
     file_id: Mapped[str] = mapped_column(nullable=False)
     tag_name: Mapped[str] = mapped_column(ForeignKey('tags.name'), nullable=False)
     file_path: Mapped[str] = mapped_column(nullable=False)
-    # payment_id: Mapped[str] = mapped_column(ForeignKey('payments.id'))
+    # payment_id: Mapped[int] = mapped_column(ForeignKey('payments.id'))
 
     user: Mapped["User"] = relationship("User", back_populates="pictures")
     tag: Mapped["Tag"] = relationship("Tag", back_populates="pictures")
@@ -51,16 +51,15 @@ class Tag(Base):
     def __repr__(self):
         return f'<Tag {self.name}>'
 
-#
-# class Payment(Base):
-#     __tablename__ = 'payments'
-#
-#     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-#     amount: Mapped[int] = mapped_column(nullable=False)
-#     currency: Mapped[str] = mapped_column(nullable=False)
-#     is_paid: Mapped[bool] = mapped_column(default=False)
-#
-#     pictures: Mapped[list["Picture"]] = relationship("Picture", back_populates="payment")
-#
-#     def __repr__(self):
-#         return f'<Payment {self.id}, amount {self.amount}, currency {self.currency}, is_paid {self.is_paid}>'
+
+class Donation(Base):
+    __tablename__ = 'payments'
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(nullable=False)
+    order_id: Mapped[str] = mapped_column(nullable=False)
+    currency: Mapped[str] = mapped_column(nullable=False)
+    total_amount: Mapped[int] = mapped_column(nullable=False)
+
+    def __repr__(self):
+        return f'<Donation {self.id}, user_id {self.user_id}, order_id {self.order_id}, total_amount {self.total_amount}>'

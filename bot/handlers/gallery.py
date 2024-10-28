@@ -6,32 +6,32 @@ from aiogram.fsm.context import FSMContext
 from bot.handlers.start import get_start
 from bot.keyboards.carousel import pics_paginator, PaginationCallback
 from bot.keyboards.tags import get_tags_kb, TagsCallbackFactory, TagsPaginationCallbackFactory
-from bot.states.search import SearchState
+from bot.states.gallery import GalleryState
 from database.config import get_session
 
 from database.requests import get_pictures_by_tag, get_all_tags
 
-search_router = Router()
+gallery_router = Router()
 
 
-@search_router.callback_query(F.data == 'search')
+@gallery_router.callback_query(F.data == 'gallery')
 async def search(callback: CallbackQuery, state: FSMContext):
     async with get_session() as session:
         tags = await get_all_tags(session)
     tags_kb = await get_tags_kb(tags, page=0)
     photo = FSInputFile('data/search_image.jpg')
-    media = InputMediaPhoto(media=photo, caption='Choose a tag to search for. 🧐', parse_mode='Markdown')
+    media = InputMediaPhoto(media=photo, caption='Choose a tag to browse for. 🧐', parse_mode='Markdown')
 
     try:
         await callback.message.edit_media(media, reply_markup=tags_kb)
     except Exception:
-        await callback.message.answer_photo(photo=photo, caption='Choose a tag to search for. 😊', reply_markup=tags_kb)
+        await callback.answer('Choose a tag to browse for. 😊', show_alert=True)
 
     await callback.answer()
-    await state.set_state(SearchState.search_tags)
+    await state.set_state(GalleryState.browse_tags)
 
 
-@search_router.callback_query(TagsCallbackFactory.filter(), StateFilter(SearchState.search_tags))
+@gallery_router.callback_query(TagsCallbackFactory.filter(), StateFilter(GalleryState.browse_tags))
 async def search_results(callback: CallbackQuery, callback_data: TagsCallbackFactory, state: FSMContext):
     tag_name = callback_data.name
     page = 0
@@ -52,7 +52,7 @@ async def search_results(callback: CallbackQuery, callback_data: TagsCallbackFac
     await callback.answer()
 
 
-@search_router.callback_query(TagsPaginationCallbackFactory.filter())
+@gallery_router.callback_query(TagsPaginationCallbackFactory.filter())
 async def handle_tags_pagination(callback: CallbackQuery, callback_data: TagsPaginationCallbackFactory):
     page = callback_data.page
 
@@ -65,7 +65,7 @@ async def handle_tags_pagination(callback: CallbackQuery, callback_data: TagsPag
     await callback.answer()
 
 
-@search_router.callback_query(PaginationCallback.filter() , StateFilter(SearchState.search_tags))
+@gallery_router.callback_query(PaginationCallback.filter() , StateFilter(GalleryState.browse_tags))
 async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallback, state: FSMContext):
     page = callback_data.page
     action = callback_data.action
@@ -85,7 +85,7 @@ async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallba
     elif action == 'back':
         await search(callback, state)
         await callback.answer()
-        await state.set_state(SearchState.search_tags)
+        await state.set_state(GalleryState.browse_tags)
         return
 
     if 0 <= current_page < len(pics):
@@ -100,14 +100,14 @@ async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallba
     await callback.answer()
 
 
-@search_router.message(StateFilter(SearchState.search_tags))
+@gallery_router.message(StateFilter(GalleryState.browse_tags))
 async def search_results(message: Message, state: FSMContext):
     await message.answer('Please use the buttons to choose a tag. 🙏 \n'
                          'Or press "Back" to go back to the main menu.', reply_markup=ReplyKeyboardRemove())
-    await state.set_state(SearchState.search_tags)
+    await state.set_state(GalleryState.browse_tags)
 
 
-@search_router.callback_query(F.data == 'back', StateFilter(SearchState.search_tags))
+@gallery_router.callback_query(F.data == 'back', StateFilter(GalleryState.browse_tags))
 async def go_back(callback: CallbackQuery, state: FSMContext):
     await get_start(callback.message)
     await callback.answer()

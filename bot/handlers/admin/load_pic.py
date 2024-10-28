@@ -36,7 +36,7 @@ load_pic_router = Router()
 
 @load_pic_router.callback_query(F.data == 'upload', IsAdmin(admin_id))
 async def upload_pic(callback: CallbackQuery, state: FSMContext):
-    await callback.message.answer('Send me a pic you want to upload.', reply_markup=back_kb)
+    await callback.message.answer('Send me a pic you want to upload🤗.', reply_markup=back_kb)
     await callback.answer()
     await state.set_state(LoadPicsState.load_pic)
 
@@ -52,7 +52,7 @@ async def upload_picture(message: Message, state: FSMContext):
 
     await state.update_data(file_id=file_info.file_id, file_path=file_name)
 
-    await message.answer('Send me a tag for this picture.', reply_markup=back_kb)
+    await message.answer('Now send me a tag for this picture😉.', reply_markup=back_kb)
     await state.set_state(LoadPicsState.load_pic_tags)
 
 
@@ -89,10 +89,10 @@ async def back_to_start(message: Message, state: FSMContext):
 
 @load_pic_router.message(StateFilter(LoadPicsState.load_pic))
 async def handle_invalid_pic(message: Message):
-    await message.answer('Please send a photo.', reply_markup=back_kb)
+    await message.answer('Please send a photo😊.', reply_markup=back_kb)
 
 
 @load_pic_router.message(F.text, StateFilter(LoadPicsState.load_pic_tags))
 async def handle_invalid_tag(message: Message):
     if not message.text.startswith('#'):
-        await message.answer('Invalid tag. Please start with #.', reply_markup=back_kb)
+        await message.answer('Invalid tag. Please start with # 😊.', reply_markup=back_kb)

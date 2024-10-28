@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from database.models import User, Picture, Tag
+from database.models import User, Picture, Tag, Donation
 
 
 async def get_user_by_tg_id(session: AsyncSession, tg_id: int) -> User:
@@ -36,3 +36,10 @@ async def get_pictures_by_tag(session: AsyncSession, tag_name: str):
     """Retrieve all pictures by a tag."""
     result = await session.execute(select(Picture).filter_by(tag_name=tag_name))
     return result.scalars().all()
+
+async def create_donation(session: AsyncSession, user_id: int, order_id: str, total_amount: int, currency: str):
+    """Create a new donation."""
+    donation = Donation(user_id=user_id, order_id=order_id, total_amount=total_amount, currency=currency)
+    session.add(donation)
+    await session.commit()
+    return donation

@@ -6,6 +6,8 @@ load_dotenv()
 
 PICS_DIR = 'pics'
 
+PAYMENTS_PROVIDER_TOKEN = os.getenv("PAYMENTS_PROVIDER_TOKEN")
+
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
 POSTGRES_USER = os.getenv("POSTGRES_USER")

@@ -12,7 +12,6 @@ TAGS_PER_PAGE = 9
 async def get_tags_kb(tags, page=0):
     sorted_tags = sorted(tags, key=lambda tag: tag.name)
 
-    # Calculate pagination range
     start = page * TAGS_PER_PAGE
     end = start + TAGS_PER_PAGE
     paginated_tags = sorted_tags[start:end]
