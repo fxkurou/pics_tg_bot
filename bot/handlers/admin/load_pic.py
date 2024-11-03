@@ -8,19 +8,17 @@ from aiogram.fsm.context import FSMContext
 
 from bot.config import PICS_DIR
 from bot.filters.admin import IsAdmin
+from bot.filters.price import PaymentAmountValidator
 from bot.filters.tag import TagValidator
 from bot.handlers.start import get_start
 from bot.keyboards.back import back_kb
-from bot.keyboards.start import start_kb
 from bot.states.load_pics import LoadPicsState
-from bot.utils.commands_text import start
 from database.config import get_session
 from database.models import Picture
 
 from dotenv import load_dotenv
 
-from database.requests import get_tag_by_name, create_tag
-
+from database.requests import get_tag_by_name, create_tag, create_payment
 
 load_dotenv()
 
@@ -60,10 +58,6 @@ async def upload_picture(message: Message, state: FSMContext):
 async def upload_picture_tag(message: Message, state: FSMContext):
     logging.info("Tag received: %s", message.text)
     tag = message.text
-    data = await state.get_data()
-    file_id = data.get('file_id')
-    file_path = data.get('file_path')
-    user_tg_id = message.from_user.id
 
     async with get_session() as session:
         if await get_tag_by_name(session, tag):
@@ -71,9 +65,37 @@ async def upload_picture_tag(message: Message, state: FSMContext):
         else:
             await create_tag(session, tag)
 
+    await state.update_data(tag_name=tag)
+
+    await message.answer('Now send me a price for this picture😊.'
+                         'Or type "skip" to make it blank.', reply_markup=back_kb)
+    await state.set_state(LoadPicsState.load_pic_price)
+
+
+@load_pic_router.message(F.text, StateFilter(LoadPicsState.load_pic_price), PaymentAmountValidator())
+async def upload_picture_price(message: Message, state: FSMContext):
+    logging.info("Price received: %s", message.text)
+    price = message.text
+    data = await state.get_data()
+    file_id = data.get('file_id')
+    file_path = data.get('file_path')
+    tag = data.get('tag_name')
+    user_tg_id = message.from_user.id
+
+    if price == 'skip':
+        validated_price = None
+    else:
+        try:
+            validated_price = int(price)
+        except ValueError:
+            await message.answer('Invalid price. Please enter a number. 😊', reply_markup=back_kb)
+            return
+
+        async with get_session() as session:
+            payment = await create_payment(session, user_tg_id, file_id, 'USD', validated_price)
 
     async with get_session() as session:
-        picture = Picture(user_tg_id=user_tg_id, file_id=file_id, file_path=file_path, tag_name=tag)
+        picture = Picture(user_tg_id=user_tg_id, file_id=file_id, file_path=file_path, tag_name=tag, payment_id=payment.id)
         session.add(picture)
         await session.commit()
 

@@ -15,7 +15,7 @@ gallery_router = Router()
 
 
 @gallery_router.callback_query(F.data == 'gallery')
-async def search(callback: CallbackQuery, state: FSMContext):
+async def gallery(callback: CallbackQuery, state: FSMContext):
     async with get_session() as session:
         tags = await get_all_tags(session)
     tags_kb = await get_tags_kb(tags, page=0)
@@ -32,7 +32,7 @@ async def search(callback: CallbackQuery, state: FSMContext):
 
 
 @gallery_router.callback_query(TagsCallbackFactory.filter(), StateFilter(GalleryState.browse_tags))
-async def search_results(callback: CallbackQuery, callback_data: TagsCallbackFactory, state: FSMContext):
+async def gallery_results(callback: CallbackQuery, callback_data: TagsCallbackFactory, state: FSMContext):
     tag_name = callback_data.name
     page = 0
 
@@ -83,7 +83,7 @@ async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallba
     elif action == 'next' and current_page < len(pics) - 1:
         current_page += 1
     elif action == 'back':
-        await search(callback, state)
+        await gallery(callback, state)
         await callback.answer()
         await state.set_state(GalleryState.browse_tags)
         return
@@ -101,7 +101,7 @@ async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallba
 
 
 @gallery_router.message(StateFilter(GalleryState.browse_tags))
-async def search_results(message: Message, state: FSMContext):
+async def wrong_input(message: Message, state: FSMContext):
     await message.answer('Please use the buttons to choose a tag. 🙏 \n'
                          'Or press "Back" to go back to the main menu.', reply_markup=ReplyKeyboardRemove())
     await state.set_state(GalleryState.browse_tags)

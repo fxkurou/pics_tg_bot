@@ -1,6 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from database.models import User, Picture, Tag, Donation
+from sqlalchemy.orm import joinedload
+
+from database.models import User, Picture, Tag, Donation, Payment
 
 
 async def get_user_by_tg_id(session: AsyncSession, tg_id: int) -> User:
@@ -37,9 +39,26 @@ async def get_pictures_by_tag(session: AsyncSession, tag_name: str):
     result = await session.execute(select(Picture).filter_by(tag_name=tag_name))
     return result.scalars().all()
 
+async def get_payed_pictures(session: AsyncSession):
+    """Retrieve all payed pictures by a user."""
+    result = await session.execute(select(Picture).options(joinedload(Picture.payment)).filter(Picture.payment_id.isnot(None)))
+    return result.scalars().all()
+
 async def create_donation(session: AsyncSession, user_id: int, order_id: str, total_amount: int, currency: str):
     """Create a new donation."""
     donation = Donation(user_id=user_id, order_id=order_id, total_amount=total_amount, currency=currency)
     session.add(donation)
     await session.commit()
     return donation
+
+async def create_payment(session: AsyncSession, user_id: int, order_id: str, currency: str, total_amount: int):
+    """Create a new payment."""
+    payment = Payment(user_id=user_id, order_id=order_id, currency=currency, total_amount=total_amount)
+    session.add(payment)
+    await session.commit()
+    return payment
+
+async def get_nickname_by_tg_id(session: AsyncSession, tg_id: int):
+    """Retrieve a user's nickname by their Telegram ID."""
+    result = await session.execute(select(User).filter_by(tg_id=tg_id))
+    return result.scalars().first().username
