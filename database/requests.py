@@ -1,6 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from sqlalchemy.orm import joinedload
+from sqlalchemy import update
 
 from database.models import User, Picture, Tag, Donation, Payment
 
@@ -62,3 +63,8 @@ async def get_nickname_by_tg_id(session: AsyncSession, tg_id: int):
     """Retrieve a user's nickname by their Telegram ID."""
     result = await session.execute(select(User).filter_by(tg_id=tg_id))
     return result.scalars().first().username
+
+async def set_paid_true(session: AsyncSession, order_id: str):
+    """Set the paid status of a picture to True."""
+    await session.execute(update(Payment).where(Payment.order_id == order_id).values(paid=True))
+    await session.commit()

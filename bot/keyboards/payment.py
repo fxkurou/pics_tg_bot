@@ -27,3 +27,12 @@ def get_payment_kb(amount: int, page: int, items: list):
     kb.row(InlineKeyboardButton(text='⬅Back', callback_data=PaymentCallbackFactory(action='back', page=page, amount=amount).pack()))
 
     return kb.as_markup()
+
+
+def get_invoice_kb(amount: int):
+    kb = InlineKeyboardBuilder()
+
+    kb.row(InlineKeyboardButton(text=f'Pay {amount}$', pay=True))
+    kb.row(InlineKeyboardButton(text='⬅Back', callback_data='back'))
+
+    return kb.as_markup()

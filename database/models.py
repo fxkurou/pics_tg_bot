@@ -75,6 +75,7 @@ class Payment(Base):
     order_id: Mapped[str] = mapped_column(nullable=False)
     currency: Mapped[str] = mapped_column(nullable=False)
     total_amount: Mapped[int] = mapped_column(nullable=False)
+    paid: Mapped[bool] = mapped_column(default=False)
 
     pictures: Mapped[list["Picture"]] = relationship("Picture", back_populates="payment")
     users: Mapped["User"] = relationship("User", back_populates="payments")

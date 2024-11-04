@@ -7,7 +7,6 @@ load_dotenv()
 PICS_DIR = 'pics'
 
 PAYMENTS_PROVIDER_TOKEN = os.getenv("PAYMENTS_PROVIDER_TOKEN")
-STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY")
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 

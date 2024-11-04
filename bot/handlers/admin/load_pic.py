@@ -72,7 +72,7 @@ async def upload_picture_tag(message: Message, state: FSMContext):
     await state.set_state(LoadPicsState.load_pic_price)
 
 
-@load_pic_router.message(F.text, StateFilter(LoadPicsState.load_pic_price), PaymentAmountValidator())
+@load_pic_router.message(F.text, StateFilter(LoadPicsState.load_pic_price))
 async def upload_picture_price(message: Message, state: FSMContext):
     logging.info("Price received: %s", message.text)
     price = message.text
