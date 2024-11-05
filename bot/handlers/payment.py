@@ -2,7 +2,7 @@ from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, InputMediaPhoto, LabeledPrice, PreCheckoutQuery, Message
 
-from bot.handlers.start import get_start
+from bot.handlers.start import handle_start
 from bot.keyboards.payment import get_payment_kb, PaymentCallbackFactory, get_invoice_kb
 from database.config import get_session
 from bot.config import PAYMENTS_PROVIDER_TOKEN
@@ -73,20 +73,20 @@ async def handle_payment_actions(callback: CallbackQuery, callback_data: Payment
         )
 
     elif action == 'back':
-        await get_start(callback.message)
+        await handle_start(callback.message)
 
     await callback.answer()
 
 
 @payment_router.pre_checkout_query()
-async def process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
+async def handle_process_pre_checkout_query(pre_checkout_query: PreCheckoutQuery):
     await pre_checkout_query.answer(ok=True)
 
 
 @payment_router.message(F.successful_payment)
-async def process_successful_payment(message: Message, state: FSMContext):
+async def handle_process_successful_payment(message: Message, state: FSMContext):
     file_id = (await state.get_data()).get('file_id')
     async with get_session() as session:
         await set_paid_true(session, file_id)
     await message.answer('Thank you for your support! 🥰')
-    await get_start(message)
+    await handle_start(message)

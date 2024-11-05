@@ -13,12 +13,12 @@ def get_payment_kb(amount: int, page: int, items: list):
     if len(items) > 1:
         if page > 0:
             kb.add(
-                InlineKeyboardButton(text='⬅Previous', callback_data=PaymentCallbackFactory(action='prev', page=page - 1).pack())
+                InlineKeyboardButton(text='⬅Previous', callback_data=PaymentCallbackFactory(action='prev', page=page - 1, amount=amount).pack())
             )
 
         if page < len(items) - 1:
             kb.add(
-                InlineKeyboardButton(text='➡Next', callback_data=PaymentCallbackFactory(action='next', page=page + 1).pack())
+                InlineKeyboardButton(text='➡Next', callback_data=PaymentCallbackFactory(action='next', page=page + 1, amount=amount).pack())
             )
         kb.adjust(2)
 

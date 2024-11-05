@@ -1,4 +1,3 @@
-from pydantic_core.core_schema import nullable_schema
 from sqlalchemy import ForeignKey, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, DeclarativeBase, relationship
 from sqlalchemy.ext.asyncio import AsyncAttrs

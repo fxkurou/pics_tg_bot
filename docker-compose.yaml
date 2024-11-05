@@ -1,0 +1,15 @@
+services:
+  bot:
+    build:
+        context: .
+    container_name: tgbot
+    env_file:
+      - .env
+    volumes:
+      - .:/usr/src/app
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+      - "6379:6379"

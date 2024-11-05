@@ -8,17 +8,17 @@ from aiogram.fsm.context import FSMContext
 
 from bot.config import PICS_DIR
 from bot.filters.admin import IsAdmin
-from bot.filters.price import PaymentAmountValidator
 from bot.filters.tag import TagValidator
-from bot.handlers.start import get_start
+from bot.handlers.start import handle_start
 from bot.keyboards.back import back_kb
 from bot.states.load_pics import LoadPicsState
+
 from database.config import get_session
 from database.models import Picture
+from database.requests import get_tag_by_name, create_tag, create_payment
+
 
 from dotenv import load_dotenv
-
-from database.requests import get_tag_by_name, create_tag, create_payment
 
 load_dotenv()
 
@@ -33,14 +33,14 @@ load_pic_router = Router()
 
 
 @load_pic_router.callback_query(F.data == 'upload', IsAdmin(admin_id))
-async def upload_pic(callback: CallbackQuery, state: FSMContext):
+async def handle_upload(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer('Send me a pic you want to upload🤗.', reply_markup=back_kb)
     await callback.answer()
     await state.set_state(LoadPicsState.load_pic)
 
 
 @load_pic_router.message(F.photo, StateFilter(LoadPicsState.load_pic))
-async def upload_picture(message: Message, state: FSMContext):
+async def handle_upload_picture(message: Message, state: FSMContext):
     picture = message.photo[-1]
     file_info = await message.bot.get_file(picture.file_id)
     file_path = file_info.file_path
@@ -55,7 +55,7 @@ async def upload_picture(message: Message, state: FSMContext):
 
 
 @load_pic_router.message(F.text, StateFilter(LoadPicsState.load_pic_tags), TagValidator())
-async def upload_picture_tag(message: Message, state: FSMContext):
+async def handle_upload_picture_tag(message: Message, state: FSMContext):
     logging.info("Tag received: %s", message.text)
     tag = message.text
 
@@ -73,8 +73,7 @@ async def upload_picture_tag(message: Message, state: FSMContext):
 
 
 @load_pic_router.message(F.text, StateFilter(LoadPicsState.load_pic_price))
-async def upload_picture_price(message: Message, state: FSMContext):
-    logging.info("Price received: %s", message.text)
+async def handle_upload_picture_price(message: Message, state: FSMContext):
     price = message.text
     data = await state.get_data()
     file_id = data.get('file_id')
@@ -99,13 +98,13 @@ async def upload_picture_price(message: Message, state: FSMContext):
         session.add(picture)
         await session.commit()
 
-    await get_start(message)
+    await handle_start(message)
     await state.clear()
 
 
 @load_pic_router.message(F.text.casefold() == '⬅back')
-async def back_to_start(message: Message, state: FSMContext):
-    await get_start(message)
+async def handle_back_to_start(message: Message, state: FSMContext):
+    await handle_start(message)
     await state.clear()
 
 

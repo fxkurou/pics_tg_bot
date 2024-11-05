@@ -3,19 +3,19 @@ from aiogram.filters import StateFilter
 from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove, InputMediaPhoto, FSInputFile
 from aiogram.fsm.context import FSMContext
 
-from bot.handlers.start import get_start
+from bot.handlers.start import handle_start
 from bot.keyboards.carousel import pics_paginator, PaginationCallback
 from bot.keyboards.tags import get_tags_kb, TagsCallbackFactory, TagsPaginationCallbackFactory
 from bot.states.gallery import GalleryState
-from database.config import get_session
 
+from database.config import get_session
 from database.requests import get_pictures_by_tag, get_all_tags
 
 gallery_router = Router()
 
 
 @gallery_router.callback_query(F.data == 'gallery')
-async def gallery(callback: CallbackQuery, state: FSMContext):
+async def handle_gallery(callback: CallbackQuery, state: FSMContext):
     async with get_session() as session:
         tags = await get_all_tags(session)
     tags_kb = await get_tags_kb(tags, page=0)
@@ -32,7 +32,7 @@ async def gallery(callback: CallbackQuery, state: FSMContext):
 
 
 @gallery_router.callback_query(TagsCallbackFactory.filter(), StateFilter(GalleryState.browse_tags))
-async def gallery_results(callback: CallbackQuery, callback_data: TagsCallbackFactory, state: FSMContext):
+async def handle_gallery_results(callback: CallbackQuery, callback_data: TagsCallbackFactory, state: FSMContext):
     tag_name = callback_data.name
     page = 0
 
@@ -66,7 +66,7 @@ async def handle_tags_pagination(callback: CallbackQuery, callback_data: TagsPag
 
 
 @gallery_router.callback_query(PaginationCallback.filter() , StateFilter(GalleryState.browse_tags))
-async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallback, state: FSMContext):
+async def handle_paginate_pics(callback: CallbackQuery, callback_data: PaginationCallback, state: FSMContext):
     page = callback_data.page
     action = callback_data.action
 
@@ -83,7 +83,7 @@ async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallba
     elif action == 'next' and current_page < len(pics) - 1:
         current_page += 1
     elif action == 'back':
-        await gallery(callback, state)
+        await handle_gallery(callback, state)
         await callback.answer()
         await state.set_state(GalleryState.browse_tags)
         return
@@ -101,14 +101,14 @@ async def paginate_pics(callback: CallbackQuery, callback_data: PaginationCallba
 
 
 @gallery_router.message(StateFilter(GalleryState.browse_tags))
-async def wrong_input(message: Message, state: FSMContext):
+async def handle_wrong_input(message: Message, state: FSMContext):
     await message.answer('Please use the buttons to choose a tag. 🙏 \n'
                          'Or press "Back" to go back to the main menu.', reply_markup=ReplyKeyboardRemove())
     await state.set_state(GalleryState.browse_tags)
 
 
 @gallery_router.callback_query(F.data == 'back', StateFilter(GalleryState.browse_tags))
-async def go_back(callback: CallbackQuery, state: FSMContext):
-    await get_start(callback.message)
+async def handle_go_back(callback: CallbackQuery, state: FSMContext):
+    await handle_start(callback.message)
     await callback.answer()
     await state.clear()

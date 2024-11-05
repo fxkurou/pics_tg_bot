@@ -19,13 +19,13 @@ start_router = Router()
 
 
 @start_router.startup()
-async def on_startup(bot: Bot) -> None:
+async def handle_startup(bot: Bot) -> None:
     await init_db()
     await bot.send_message(chat_id=ADMIN_ID, text='Bot started')
 
 
 @start_router.message(CommandStart())
-async def get_start(message: Message):
+async def handle_start(message: Message):
     tg_id = message.from_user.id
     username = message.from_user.username
 
