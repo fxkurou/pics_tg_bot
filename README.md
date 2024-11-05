@@ -1,7 +1,7 @@
 # Pics tg bot
 
 ## Description
-My Bot is a Telegram bot built using the Aiogram framework. It provides various functionalities including pagination and payment features.
+Pics tg bot id a Telegram bot built using the Aiogram framework. It provides various functionalities including pagination and payment features.
 
 ## Features
 - Help command to provide assistance to users.
