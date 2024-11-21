@@ -19,7 +19,7 @@ async def handle_gallery(callback: CallbackQuery, state: FSMContext):
     async with get_session() as session:
         tags = await get_all_tags(session)
     tags_kb = await get_tags_kb(tags, page=0)
-    photo = FSInputFile('data/search_image.jpg')
+    photo = FSInputFile('data/gallery_image.jpg')
     media = InputMediaPhoto(media=photo, caption='Choose a tag to browse for. 🧐', parse_mode='Markdown')
 
     try:
